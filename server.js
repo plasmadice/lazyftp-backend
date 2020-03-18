@@ -35,7 +35,9 @@ app.post("/navigate", (req, res) => {
 
       // decrypt data received from frontend
       var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
+      console.log("Ciphertext:", cipherText);
       var decipherText = simpleCrypto.decrypt(cipherText);
+      console.log("Deciphertext:", decipherText);
 
       const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decipherText);
 
