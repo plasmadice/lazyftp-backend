@@ -38,7 +38,7 @@ app.post("/navigate", (req, res) => {
       );
       var decryptedData;
       try {
-        JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+        decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
       } catch (e) {
         console.log(e);
       }
@@ -112,7 +112,7 @@ app.post("/disconnect", (req, res) => {
     const bytes = CryptoJS.AES.decrypt(await ciphertext, process.env.PASSWORD);
     var decryptedData;
     try {
-      JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+      decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
     } catch (e) {
       console.log(e);
     }
