@@ -16,19 +16,21 @@ const clients = {};
 // basic-ftp
 
 app.post("/navigate", (req, res) => {
-  console.log(req.body.ciphertext);
   if (req.body && req.body.ciphertext) {
     const { ciphertext } = req.body;
-
-    // decrypt data received from frontend
-    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-    const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
 
     init();
 
     async function init() {
+      // decrypt data received from frontend
+      const bytes = CryptoJS.AES.decrypt(
+        await ciphertext,
+        process.env.PASSWORD
+      );
+      const decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+
+      const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
+
       // if user is found and logged in
       if (
         clients[ftpUser] !== undefined &&
@@ -85,11 +87,16 @@ app.post("/navigate", (req, res) => {
 // removes and disconnects client
 app.post("/disconnect", (req, res) => {
   if (req.body && req.body.ciphertext) {
+  } else {
+    res.status(400).send("Unauthorized access.");
+  }
+
+  const init = async () => {
     const { ciphertext } = req.body;
 
     // decrypt data received from frontend
-    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    const bytes = CryptoJS.AES.decrypt(await ciphertext, process.env.PASSWORD);
+    const decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
 
     const { ftpUser } = decryptedData;
 
@@ -104,9 +111,7 @@ app.post("/disconnect", (req, res) => {
       // if user is not at all logged in
       res.status(204).send("User already disconnected");
     }
-  } else {
-    res.status(400).send("Unauthorized access.");
-  }
+  };
 });
 
 app.listen(
