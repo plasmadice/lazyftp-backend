@@ -25,9 +25,6 @@ const clients = {};
 
 // basic-ftp
 
-console.log(process.env.PASSWORD);
-console.log("test", process.env.PASSWORD);
-
 app.post("/navigate", (req, res) => {
   if (req.body && req.body.cipherText) {
     init();
