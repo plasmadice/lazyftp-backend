@@ -4,7 +4,7 @@ const cors = require("cors");
 const ftp = require("basic-ftp");
 const CryptoJS = require("crypto-js");
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 const app = express();
 app.use(express.json()); // for parsing application/json
@@ -12,8 +12,6 @@ app.use(cors());
 
 // initializes as empty client array
 const clients = {};
-
-console.log(process.env.NODE_ENV);
 
 // basic-ftp
 
