@@ -13,6 +13,8 @@ app.use(cors());
 // initializes as empty client array
 const clients = {};
 
+console.log(process.env.NODE_ENV);
+
 // basic-ftp
 
 app.post("/navigate", (req, res) => {
