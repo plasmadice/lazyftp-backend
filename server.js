@@ -33,7 +33,7 @@ app.post("/navigate", (req, res) => {
       const { cipherText } = req.body;
 
       // decrypt data received from frontend
-      var simpleCrypto = new SimpleCrypto("test");
+      var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
       var decipherText = simpleCrypto.decrypt(cipherText);
 
       const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decipherText);
@@ -102,7 +102,7 @@ app.post("/disconnect", (req, res) => {
     const { cipherText } = req.body;
 
     // decrypt data received from frontend
-    var simpleCrypto = new SimpleCrypto("test");
+    var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
     var decipherText = simpleCrypto.decrypt(cipherText);
 
     const { ftpUser } = JSON.parse(decipherText);
