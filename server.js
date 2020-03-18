@@ -4,7 +4,7 @@ const cors = require("cors");
 const ftp = require("basic-ftp");
 const CryptoJS = require("crypto-js");
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.json()); // for parsing application/json
@@ -58,7 +58,6 @@ app.post("/navigate", (req, res) => {
         // if no user found OR user found but not connected: reconnects
         const client = new ftp.Client();
         // console.log(`Creating new connection for: ${ftpUser}`);
-
         try {
           await client.access({
             host: ftpHost,
@@ -72,7 +71,8 @@ app.post("/navigate", (req, res) => {
           const list = await client.list(path);
           res.status(200).send(list);
         } catch (err) {
-          console.log(err);
+          console.log("Failed to connect to server", err);
+          res.status(400).send("Failed to connect to server");
         }
       }
     }
@@ -108,6 +108,14 @@ app.post("/disconnect", (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`server started on port ${PORT}`);
-});
+app.listen(
+  PORT,
+  process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost",
+  () => {
+    if (process.env.NODE_ENV === "production") {
+      console.log(`Server started in production. Port: ${PORT}`);
+    } else {
+      console.log(`Server started in ${process.env.NODE_ENV} on port ${PORT}`);
+    }
+  }
+);
