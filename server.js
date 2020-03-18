@@ -3,11 +3,11 @@ require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
 var SimpleCrypto = require("simple-crypto-js").default;
+
 const PORT = process.env.PORT || 3000;
 
-// playground end
-
 const app = express();
+
 app.use(express.json()); // for parsing application/json
 app.use(cors());
 
@@ -19,6 +19,8 @@ app.use(function(req, res, next) {
   );
   next();
 });
+
+console.log(process.env.PASSWORD);
 
 // initializes as empty client array
 const clients = {};
