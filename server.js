@@ -25,6 +25,9 @@ const clients = {};
 
 // basic-ftp
 
+console.log(process.env.PASSWORD);
+console.log("test", process.env.PASSWORD);
+
 app.post("/navigate", (req, res) => {
   if (req.body && req.body.cipherText) {
     init();
@@ -87,6 +90,7 @@ app.post("/navigate", (req, res) => {
       }
     }
   } else {
+    // Invalid request to server
     res.status(400).send("Unauthorized access.");
   }
 });
