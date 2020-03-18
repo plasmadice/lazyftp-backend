@@ -29,16 +29,10 @@ app.post("/navigate", (req, res) => {
     init();
 
     async function init() {
-      const { ciphertext } = await req.body;
+      const { ciphertext } = req.body;
       // decrypt data received from frontend
       const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-      var decryptedData;
-      try {
-        decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      } catch (e) {
-        console.log("Ciphertext:", ciphertext);
-        console.log(e);
-      }
+      var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
 
       const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
 
@@ -103,17 +97,11 @@ app.post("/disconnect", (req, res) => {
   }
 
   const init = async () => {
-    const { ciphertext } = await req.body;
+    const { ciphertext } = req.body;
 
     // decrypt data received from frontend
     const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-    var decryptedData;
-    try {
-      decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    } catch (e) {
-      console.log("Ciphertext:", ciphertext);
-      console.log(e);
-    }
+    var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
 
     const { ftpUser } = decryptedData;
 
