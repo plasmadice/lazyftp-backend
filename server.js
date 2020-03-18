@@ -3,7 +3,6 @@ require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
 var SimpleCrypto = require("simple-crypto-js").default;
-
 const PORT = process.env.PORT || 3000;
 
 // playground end
@@ -34,10 +33,8 @@ app.post("/navigate", (req, res) => {
       const { cipherText } = req.body;
 
       // decrypt data received from frontend
-      var simpleCrypto = new SimpleCrypto("Test for science.");
-      console.log("Ciphertext:", cipherText);
+      var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
       var decipherText = simpleCrypto.decrypt(cipherText);
-      console.log("Deciphertext:", decipherText);
 
       const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decipherText);
 
