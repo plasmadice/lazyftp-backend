@@ -31,8 +31,15 @@ app.post("/navigate", (req, res) => {
     async function init() {
       const { ciphertext } = req.body;
       // decrypt data received from frontend
+      console.log("Ciphertext:", ciphertext);
       const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
+      console.log("Bytes:", bytes);
+
+      console.log("CryptoJS keys:", Object.keys(CryptoJS).length);
+
       var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+
+      console.log("Decrypteddata:", decryptedData);
 
       const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
 
