@@ -34,7 +34,7 @@ app.post("/navigate", (req, res) => {
       const { cipherText } = req.body;
 
       // decrypt data received from frontend
-      var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
+      var simpleCrypto = new SimpleCrypto("Test for science.");
       console.log("Ciphertext:", cipherText);
       var decipherText = simpleCrypto.decrypt(cipherText);
       console.log("Deciphertext:", decipherText);
