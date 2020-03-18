@@ -77,7 +77,7 @@ app.post("/navigate", (req, res) => {
       }
     }
   } else {
-    req.status(400).send("Unauthorized access.");
+    res.status(400).send("Unauthorized access.");
   }
 });
 
@@ -104,7 +104,7 @@ app.post("/disconnect", (req, res) => {
       res.status(204).send("User already disconnected");
     }
   } else {
-    req.status(400).send("Unauthorized access.");
+    res.status(400).send("Unauthorized access.");
   }
 });
 
