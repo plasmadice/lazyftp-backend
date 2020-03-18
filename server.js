@@ -26,11 +26,10 @@ const clients = {};
 
 app.post("/navigate", (req, res) => {
   if (req.body && req.body.ciphertext) {
-    const { ciphertext } = req.body;
-
     init();
 
     async function init() {
+      const { ciphertext } = await req.body;
       // decrypt data received from frontend
       const bytes = CryptoJS.AES.decrypt(
         await ciphertext,
@@ -106,7 +105,7 @@ app.post("/disconnect", (req, res) => {
   }
 
   const init = async () => {
-    const { ciphertext } = req.body;
+    const { ciphertext } = await req.body;
 
     // decrypt data received from frontend
     const bytes = CryptoJS.AES.decrypt(await ciphertext, process.env.PASSWORD);
