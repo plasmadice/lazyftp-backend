@@ -2,7 +2,6 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
-const CryptoJS = require("crypto-js");
 var SimpleCrypto = require("simple-crypto-js").default;
 
 const PORT = process.env.PORT || 3000;
