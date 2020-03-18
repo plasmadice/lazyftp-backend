@@ -36,7 +36,7 @@ app.post("/navigate", (req, res) => {
         await JSON.stringify(bytes.toString(CryptoJS.enc.Utf8))
       );
 
-      console.log(decryptedData);
+      console.log("Decrypted data:", decryptedData);
 
       const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decryptedData);
 
