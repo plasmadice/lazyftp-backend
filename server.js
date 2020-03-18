@@ -16,87 +16,95 @@ const clients = {};
 // basic-ftp
 
 app.post("/navigate", (req, res) => {
-  const { ciphertext } = req.body;
+  if (req.body && req.body.ciphertext) {
+    const { ciphertext } = req.body;
 
-  // decrypt data received from frontend
-  const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-  const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    // decrypt data received from frontend
+    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-  const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
+    const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
 
-  init();
+    init();
 
-  async function init() {
-    // if user is found and logged in
-    if (
-      clients[ftpUser] !== undefined &&
-      clients[ftpUser].status === "connected"
-    ) {
-      let status;
+    async function init() {
+      // if user is found and logged in
+      if (
+        clients[ftpUser] !== undefined &&
+        clients[ftpUser].status === "connected"
+      ) {
+        let status;
 
-      // tries to access connection status
-      try {
-        status = await clients[ftpUser].send("STAT", err => {
-          if (err) {
-            console.log(err);
-          }
-        });
-      } catch (e) {
-        clients[ftpUser].status = "disconnected";
-      }
+        // tries to access connection status
+        try {
+          status = await clients[ftpUser].send("STAT", err => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        } catch (e) {
+          clients[ftpUser].status = "disconnected";
+        }
 
-      // if connection status is good: return list
-      if (clients[ftpUser].status === "connected") {
-        const list = await clients[ftpUser].list(path);
-        res.status(200).send(list);
+        // if connection status is good: return list
+        if (clients[ftpUser].status === "connected") {
+          const list = await clients[ftpUser].list(path);
+          res.status(200).send(list);
+        } else {
+          // if connection status is bad: RETRY
+          init();
+        }
       } else {
-        // if connection status is bad: RETRY
-        init();
-      }
-    } else {
-      // if no user found OR user found but not connected: reconnects
-      const client = new ftp.Client();
-      // console.log(`Creating new connection for: ${ftpUser}`);
+        // if no user found OR user found but not connected: reconnects
+        const client = new ftp.Client();
+        // console.log(`Creating new connection for: ${ftpUser}`);
 
-      try {
-        await client.access({
-          host: ftpHost,
-          user: ftpUser,
-          password: ftpPassword
-        });
+        try {
+          await client.access({
+            host: ftpHost,
+            user: ftpUser,
+            password: ftpPassword
+          });
 
-        clients[ftpUser] = client;
-        clients[ftpUser].status = "connected";
+          clients[ftpUser] = client;
+          clients[ftpUser].status = "connected";
 
-        const list = await client.list(path);
-        res.status(200).send(list);
-      } catch (err) {
-        console.log(err);
+          const list = await client.list(path);
+          res.status(200).send(list);
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
+  } else {
+    req.status(400).send("Unauthorized access.");
   }
 });
 
 // removes and disconnects client
 app.post("/disconnect", (req, res) => {
-  const { ciphertext } = req.body;
+  if (req.body && req.body.ciphertext) {
+    const { ciphertext } = req.body;
 
-  // decrypt data received from frontend
-  const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-  const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    // decrypt data received from frontend
+    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-  const { ftpUser } = decryptedData;
+    const { ftpUser } = decryptedData;
 
-  if (
-    clients[ftpUser] !== undefined &&
-    clients[ftpUser].status === "connected"
-  ) {
-    clients[ftpUser].close();
-    delete clients[ftpUser];
-    res.status(200).send("Successfully logged out");
-  } else if (clients[ftpUser] === undefined) {
-    // if user is not at all logged in
-    res.status(204).send("User already disconnected");
+    if (
+      clients[ftpUser] !== undefined &&
+      clients[ftpUser].status === "connected"
+    ) {
+      clients[ftpUser].close();
+      delete clients[ftpUser];
+      res.status(200).send("Successfully logged out");
+    } else if (clients[ftpUser] === undefined) {
+      // if user is not at all logged in
+      res.status(204).send("User already disconnected");
+    }
+  } else {
+    req.status(400).send("Unauthorized access.");
   }
 });
 
