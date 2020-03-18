@@ -16,6 +16,7 @@ const clients = {};
 // basic-ftp
 
 app.post("/navigate", (req, res) => {
+  console.log(req.body.ciphertext);
   if (req.body && req.body.ciphertext) {
     const { ciphertext } = req.body;
 
