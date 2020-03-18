@@ -31,14 +31,12 @@ app.post("/navigate", (req, res) => {
     async function init() {
       const { ciphertext } = await req.body;
       // decrypt data received from frontend
-      const bytes = CryptoJS.AES.decrypt(
-        await ciphertext,
-        process.env.PASSWORD
-      );
+      const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
       var decryptedData;
       try {
-        decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+        decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
       } catch (e) {
+        console.log("Ciphertext:", ciphertext);
         console.log(e);
       }
 
@@ -108,11 +106,12 @@ app.post("/disconnect", (req, res) => {
     const { ciphertext } = await req.body;
 
     // decrypt data received from frontend
-    const bytes = CryptoJS.AES.decrypt(await ciphertext, process.env.PASSWORD);
+    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
     var decryptedData;
     try {
-      decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+      decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     } catch (e) {
+      console.log("Ciphertext:", ciphertext);
       console.log(e);
     }
 
