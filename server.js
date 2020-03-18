@@ -3,8 +3,11 @@ require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
 const CryptoJS = require("crypto-js");
+var SimpleCrypto = require("simple-crypto-js").default;
 
 const PORT = process.env.PORT || 3000;
+
+// playground end
 
 const app = express();
 app.use(express.json()); // for parsing application/json
@@ -25,22 +28,17 @@ const clients = {};
 // basic-ftp
 
 app.post("/navigate", (req, res) => {
-  if (req.body && req.body.ciphertext) {
+  if (req.body && req.body.cipherText) {
     init();
 
     async function init() {
-      const { ciphertext } = req.body;
+      const { cipherText } = req.body;
+
       // decrypt data received from frontend
-      console.log("Ciphertext:", ciphertext);
-      const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-      console.log("Bytes:", bytes);
+      var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
+      var decipherText = simpleCrypto.decrypt(cipherText);
 
-      console.log("CryptoJS keys:", Object.keys(CryptoJS).length);
-      console.log("Decrypteddata:", bytes.toString(CryptoJS.enc.Utf8));
-
-      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-      const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
+      const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decipherText);
 
       // if user is found and logged in
       if (
@@ -97,20 +95,19 @@ app.post("/navigate", (req, res) => {
 
 // removes and disconnects client
 app.post("/disconnect", (req, res) => {
-  if (req.body && req.body.ciphertext) {
+  if (req.body && req.body.cipherText) {
   } else {
     res.status(400).send("Unauthorized access.");
   }
 
   const init = async () => {
-    const { ciphertext } = req.body;
+    const { cipherText } = req.body;
 
     // decrypt data received from frontend
-    const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
+    var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
+    var decipherText = simpleCrypto.decrypt(cipherText);
 
-    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
-    const { ftpUser } = decryptedData;
+    const { ftpUser } = JSON.parse(decipherText);
 
     if (
       clients[ftpUser] !== undefined &&
