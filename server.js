@@ -32,13 +32,9 @@ app.post("/navigate", (req, res) => {
       const { ciphertext } = req.body;
       // decrypt data received from frontend
       const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
-      var decryptedData = JSON.parse(
-        await JSON.stringify(bytes.toString(CryptoJS.enc.Utf8))
-      );
+      var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
 
-      console.log("Decrypted data:", decryptedData);
-
-      const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decryptedData);
+      const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
 
       // if user is found and logged in
       if (
@@ -106,11 +102,9 @@ app.post("/disconnect", (req, res) => {
     // decrypt data received from frontend
     const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
 
-    var decryptedData = JSON.parse(
-      await JSON.stringify(bytes.toString(CryptoJS.enc.Utf8))
-    );
+    var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
 
-    const { ftpUser } = JSON.parse(decryptedData);
+    const { ftpUser } = decryptedData;
 
     if (
       clients[ftpUser] !== undefined &&
