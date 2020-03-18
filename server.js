@@ -36,10 +36,9 @@ app.post("/navigate", (req, res) => {
       console.log("Bytes:", bytes);
 
       console.log("CryptoJS keys:", Object.keys(CryptoJS).length);
+      console.log("Decrypteddata:", bytes.toString(CryptoJS.enc.Utf8));
 
-      var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
-
-      console.log("Decrypteddata:", decryptedData);
+      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
       const { ftpHost, ftpUser, ftpPassword, path } = decryptedData;
 
@@ -109,7 +108,7 @@ app.post("/disconnect", (req, res) => {
     // decrypt data received from frontend
     const bytes = CryptoJS.AES.decrypt(ciphertext, process.env.PASSWORD);
 
-    var decryptedData = JSON.parse(await bytes.toString(CryptoJS.enc.Utf8));
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
     const { ftpUser } = decryptedData;
 
