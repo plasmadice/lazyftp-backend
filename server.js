@@ -36,7 +36,9 @@ app.post("/navigate", (req, res) => {
       var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
       var decipherText = simpleCrypto.decrypt(cipherText);
 
-      const { ftpHost, ftpUser, ftpPassword, path } = JSON.parse(decipherText);
+      const { ftpHost, ftpUser, ftpPassword, ftpSecure, path } = JSON.parse(
+        decipherText
+      );
 
       // if user is found and logged in
       if (
@@ -72,7 +74,8 @@ app.post("/navigate", (req, res) => {
           await client.access({
             host: ftpHost,
             user: ftpUser,
-            password: ftpPassword
+            password: ftpPassword,
+            secure: ftpSecure
           });
 
           clients[ftpUser] = client;
