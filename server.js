@@ -2,7 +2,9 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
-var SimpleCrypto = require("simple-crypto-js").default;
+var CryptoJS = require("crypto-js");
+
+// var SimpleCrypto = require("simple-crypto-js").default;
 
 const PORT = process.env.PORT || 3000;
 
@@ -11,7 +13,7 @@ const app = express();
 app.use(express.json()); // for parsing application/json
 app.use(cors());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Headers",
@@ -27,18 +29,12 @@ const clients = {};
 
 app.post("/navigate", (req, res) => {
   if (req.body && req.body.cipherText) {
-    init();
-
     async function init() {
       const { cipherText } = req.body;
+      var bytes = CryptoJS.AES.decrypt(cipherText, process.env.PASSWORD);
+      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-      // decrypt data received from frontend
-      var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
-      var decipherText = simpleCrypto.decrypt(cipherText);
-
-      const { ftpHost, ftpUser, ftpPassword, ftpSecure, path } = JSON.parse(
-        decipherText
-      );
+      const { ftpHost, ftpUser, ftpPassword, ftpSecure, path } = decryptedData;
 
       // if user is found and logged in
       if (
@@ -49,7 +45,7 @@ app.post("/navigate", (req, res) => {
 
         // tries to access connection status
         try {
-          status = await clients[ftpUser].send("STAT", err => {
+          status = await clients[ftpUser].send("STAT", (err) => {
             if (err) {
               console.log(err);
             }
@@ -69,13 +65,14 @@ app.post("/navigate", (req, res) => {
       } else {
         // if no user found OR user found but not connected: reconnects
         const client = new ftp.Client();
+        console.log("No user found, attempting login");
         // console.log(`Creating new connection for: ${ftpUser}`);
         try {
           await client.access({
             host: ftpHost,
             user: ftpUser,
             password: ftpPassword,
-            secure: ftpSecure
+            secure: ftpSecure,
           });
 
           clients[ftpUser] = client;
@@ -89,6 +86,8 @@ app.post("/navigate", (req, res) => {
         }
       }
     }
+
+    init();
   } else {
     // Invalid request to server
     res.status(400).send("Unauthorized access.");
@@ -97,7 +96,7 @@ app.post("/navigate", (req, res) => {
 
 // removes and disconnects client
 app.post("/disconnect", (req, res) => {
-  if (req.body && req.body.cipherText) {
+  if (req.body) {
   } else {
     res.status(400).send("Unauthorized access.");
   }
@@ -105,11 +104,10 @@ app.post("/disconnect", (req, res) => {
   const init = async () => {
     const { cipherText } = req.body;
 
-    // decrypt data received from frontend
-    var simpleCrypto = new SimpleCrypto(process.env.PASSWORD);
-    var decipherText = simpleCrypto.decrypt(cipherText);
+    var bytes = CryptoJS.AES.decrypt(cipherText, process.env.PASSWORD);
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-    const { ftpUser } = JSON.parse(decipherText);
+    const { ftpUser } = decryptedData;
 
     if (
       clients[ftpUser] !== undefined &&
@@ -129,12 +127,8 @@ app.post("/disconnect", (req, res) => {
 
 app.listen(
   PORT,
-  process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost",
+  process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
   () => {
-    if (process.env.NODE_ENV === "production") {
-      console.log(`Server started in production. Port: ${PORT}`);
-    } else {
-      console.log(`Server started in ${process.env.NODE_ENV} on port ${PORT}`);
-    }
+    console.log(`Server started in ${process.env.NODE_ENV} on port ${PORT}`);
   }
 );
