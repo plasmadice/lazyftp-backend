@@ -28,79 +28,74 @@ const clients = {};
 // basic-ftp
 
 app.post("/navigate", (req, res) => {
-  if (req.body && req.body.cipherText) {
-    async function init() {
-      const { cipherText } = req.body;
-      var bytes = CryptoJS.AES.decrypt(cipherText, process.env.PASSWORD);
-      var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  async function init() {
+    const { cipherText } = req.body;
+    var bytes = CryptoJS.AES.decrypt(cipherText, process.env.PASSWORD);
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 
-      const { ftpHost, ftpUser, ftpPassword, ftpSecure, path } = decryptedData;
+    const { ftpHost, ftpUser, ftpPassword, ftpSecure, path } = decryptedData;
 
-      // if user is found and logged in
-      if (
-        clients[ftpUser] !== undefined &&
-        clients[ftpUser].status === "connected"
-      ) {
-        let status;
+    // if user is found and logged in
+    if (
+      clients[ftpUser] !== undefined &&
+      clients[ftpUser].status === "connected"
+    ) {
+      let status;
 
-        // tries to access connection status
-        try {
-          status = await clients[ftpUser].send("STAT", (err) => {
-            if (err) {
-              console.log(err);
-            }
-          });
-        } catch (e) {
-          clients[ftpUser].status = "disconnected";
-        }
+      // tries to access connection status
+      try {
+        status = await clients[ftpUser].send("STAT", (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+      } catch (e) {
+        clients[ftpUser].status = "disconnected";
+      }
 
-        // if connection status is good: return list
-        if (clients[ftpUser].status === "connected") {
-          const list = await clients[ftpUser].list(path);
-          res.status(200).send(list);
-        } else {
-          // if connection status is bad: RETRY
-          init();
-        }
+      // if connection status is good: return list
+      if (clients[ftpUser].status === "connected") {
+        const list = await clients[ftpUser].list(path);
+        res.status(200).send(list);
       } else {
-        // if no user found OR user found but not connected: reconnects
-        const client = new ftp.Client();
-        console.log("No user found, attempting login");
-        // console.log(`Creating new connection for: ${ftpUser}`);
-        try {
-          await client.access({
-            host: ftpHost,
-            user: ftpUser,
-            password: ftpPassword,
-            secure: ftpSecure,
-          });
+        // if connection status is bad: RETRY
+        init();
+      }
+    } else {
+      // if no user found OR user found but not connected: reconnects
+      const client = new ftp.Client();
 
-          clients[ftpUser] = client;
-          clients[ftpUser].status = "connected";
+      try {
+        await client.access({
+          host: ftpHost,
+          user: ftpUser,
+          password: ftpPassword,
+          secure: ftpSecure,
+        });
 
-          const list = await client.list(path);
-          res.status(200).send(list);
-        } catch (err) {
-          console.log("Failed to connect to server", err);
-          res.status(400).send("Failed to connect to server");
-        }
+        clients[ftpUser] = client;
+        clients[ftpUser].status = "connected";
+
+        const list = await client.list(path);
+        res.status(200).send(list);
+      } catch (err) {
+        res.status(400).send(err);
       }
     }
+  }
 
+  if (req.body && req.body.cipherText) {
     init();
   } else {
     // Invalid request to server
-    res.status(400).send("Unauthorized access.");
+    res
+      .status(400)
+      .send("Incorrectly formatted body. Must be stringified JSON.");
   }
 });
 
 // removes and disconnects client
 app.post("/disconnect", (req, res) => {
-  if (req.body) {
-  } else {
-    res.status(400).send("Unauthorized access.");
-  }
-
   const init = async () => {
     const { cipherText } = req.body;
 
@@ -122,7 +117,13 @@ app.post("/disconnect", (req, res) => {
     }
   };
 
-  init();
+  if (req.body) {
+    init();
+  } else {
+    res
+      .status(400)
+      .send("Incorrectly formatted body. Must be stringified JSON.");
+  }
 });
 
 app.listen(
