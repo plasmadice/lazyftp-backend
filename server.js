@@ -4,8 +4,6 @@ const cors = require("cors");
 const ftp = require("basic-ftp");
 var CryptoJS = require("crypto-js");
 
-// var SimpleCrypto = require("simple-crypto-js").default;
-
 const PORT = process.env.PORT || 3000;
 
 const app = express();
