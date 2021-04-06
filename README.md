@@ -6,13 +6,10 @@
 ### Details
 
 - Encrypted data is sent from the frontend to this server where it is decrypted using a key.
-- Official URL: https://lazyanime.com/
-- Netlify URL: https://elastic-panini-7bfc59.netlify.com/
-
-### Details:
-
 - Uses a version of crypto-js to encrypt data as it's sent out, and decrypt it on the server side.
 - Only data stored is user's FTP client connection info (which is removed if you hit "Disconnect" or are timed out and attempt to connect.
+- Official URL: https://lazyanime.com/
+- Netlify URL: https://elastic-panini-7bfc59.netlify.com/
 
 ### Tech:
 
