@@ -1,4 +1,5 @@
 const express = require("express");
+// const fs = require("fs");
 require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
@@ -25,6 +26,9 @@ const clients = {};
 
 // loops through clients and removes clients exceeding 300 seconds
 const trimClients = () => {
+  // if (clients.length) {
+  //   console.log(`clients.length: ${clients.length}`);
+  // }
   for (const client in clients) {
     const time = new Date().getTime();
     if (Math.abs(clients[client].lastAccessed - time) > 300000) {
@@ -129,6 +133,14 @@ app.listen(
   PORT,
   process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
   () => {
-    console.log(`Server started in ${process.env.NODE_ENV} on port ${PORT}`);
+    console.log(
+      `Server started in ${
+        process.env.NODE_ENV
+      } on port ${PORT}\nBackend: http://localhost:${PORT}/${
+        process.env.NODE_ENV === "development"
+          ? "\nFrontend: http://localhost:8000/"
+          : null
+      }`
+    );
   }
 );
