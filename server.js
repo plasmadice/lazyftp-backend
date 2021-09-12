@@ -4,6 +4,9 @@ const cors = require("cors");
 const ftp = require("basic-ftp");
 var CryptoJS = require("crypto-js");
 
+const db = require('./db')
+db.connect()
+
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -79,8 +82,10 @@ app.post("/navigate", (req, res) => {
         clients[ftpHost + ftpUser] = client;
 
         const list = await client.list(path);
+        db.update('lazyftp', 'successful_logins')
         res.status(200).send(list);
       } catch (err) {
+        db.update('lazyftp', 'failed_logins')
         res.status(400).send(err);
       }
     }
@@ -90,6 +95,7 @@ app.post("/navigate", (req, res) => {
     init();
   } else {
     // Invalid request to server
+    db.update('lazyftp', 'invalid_requests')
     res
       .status(400)
       .send("Incorrectly formatted body. Must be stringified JSON.");
@@ -122,6 +128,7 @@ app.post("/disconnect", (req, res) => {
   if (req.body) {
     init();
   } else {
+    db.update('lazyftp', 'failed_logins')
     res
       .status(400)
       .send("Incorrectly formatted body. Must be stringified JSON.");
