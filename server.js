@@ -1,5 +1,4 @@
 const express = require("express");
-// const fs = require("fs");
 require("dotenv").config();
 const cors = require("cors");
 const ftp = require("basic-ftp");
@@ -134,12 +133,10 @@ app.listen(
   process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1",
   () => {
     console.log(
-      `Server started in ${
-        process.env.NODE_ENV
-      } on port ${PORT}\nBackend: http://localhost:${PORT}/${
-        process.env.NODE_ENV === "development"
-          ? "\nFrontend: http://localhost:8000/"
-          : null
+      `Server started in ${process.env.NODE_ENV
+      } on port ${PORT}\nBackend: http://localhost:${PORT}/${process.env.NODE_ENV === "development"
+        ? "\nFrontend: http://localhost:8000/"
+        : null
       }`
     );
   }
