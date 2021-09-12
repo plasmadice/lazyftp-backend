@@ -1,14 +1,14 @@
-const { Client } = require('pg');
+const { Client } = require('pg')
 
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
-});
+})
 
 const connect = () => {
-  client.connect();
+  client.connect()
 }
 
 const update = (siteName, type) => {
@@ -22,7 +22,7 @@ const update = (siteName, type) => {
     for (let row of res.rows) {
       console.log(JSON.stringify(row));
     }
-  });
+  })
 }
 
 module.exports = {

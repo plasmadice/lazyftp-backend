@@ -20,5 +20,4 @@
 
 - Download media through browser
 - Optionally convert videos to mp4 to view in browser
-- Credentials-store usint postgresql
 - Needs more error reporting

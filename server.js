@@ -28,9 +28,6 @@ const clients = {};
 
 // loops through clients and removes clients exceeding 300 seconds
 const trimClients = () => {
-  // if (clients.length) {
-  //   console.log(`clients.length: ${clients.length}`);
-  // }
   for (const client in clients) {
     const time = new Date().getTime();
     if (Math.abs(clients[client].lastAccessed - time) > 300000) {
@@ -53,7 +50,7 @@ app.post("/navigate", (req, res) => {
 
     const { ftpHost, ftpUser, ftpPassword, ftpSecure, path } = decryptedData;
 
-    // if user is found and logged in
+    // if user is found and already logged in: reuses connection
     if (clients[ftpHost + ftpUser] !== undefined) {
       // if connection status is good: return list
       if (!clients[ftpHost + ftpUser].closed) {
@@ -65,7 +62,7 @@ app.post("/navigate", (req, res) => {
         init();
       }
     } else {
-      // if no user found OR user found but not connected: reconnects
+      // if no user found OR user found but not connected: creates new connection for user
 
       const client = new ftp.Client();
 
@@ -128,7 +125,7 @@ app.post("/disconnect", (req, res) => {
   if (req.body) {
     init();
   } else {
-    db.update('lazyftp', 'failed_logins')
+    db.update('lazyftp', 'invalid_requests')
     res
       .status(400)
       .send("Incorrectly formatted body. Must be stringified JSON.");
