@@ -13,7 +13,7 @@ const connect = () => {
 
 const fetchStats = async () => {
   const result = await client.query({
-    text: 'SELECT * FROM site_data'
+    text: 'SELECT page_visits FROM site_data'
   })
 
   return result.rows
