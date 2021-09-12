@@ -132,9 +132,15 @@ app.post("/disconnect", (req, res) => {
   }
 })
 
-app.post('update', (req, res) => {
+// route used to update database -- primarily used by frontend to update page views
+app.post('/update', (req, res) => {
   const init = async () => {
+    const { cipherText } = req.body
+    var bytes = CryptoJS.AES.decrypt(cipherText, process.env.PASSWORD)
+    var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8))
+    const { siteName, type } = decryptedData
 
+    db.update(siteName, type)
   }
 
   if (req.body && req.body.cipherText) {
@@ -144,6 +150,21 @@ app.post('update', (req, res) => {
     db.update('lazyftp', 'invalid_requests')
     res
       .status(400)
+      .send("Incorrectly formatted body. Must be stringified JSON.")
+  }
+})
+
+// route used by frontend to update <Stats /> component
+app.post('/stats', async (req, res) => {
+  const init = async () => {
+    const result = await db.fetchStats()
+    res.send(result)
+  }
+
+  if (req.body && req.body.PASSWORD === process.env.PASSWORD) {
+    init()
+  } else {
+    res.status(400)
       .send("Incorrectly formatted body. Must be stringified JSON.")
   }
 })

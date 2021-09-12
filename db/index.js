@@ -11,6 +11,14 @@ const connect = () => {
   client.connect()
 }
 
+const fetchStats = async () => {
+  const result = await client.query({
+    text: 'SELECT * FROM site_data'
+  })
+
+  return result.rows
+}
+
 const update = (siteName, type) => {
   const query = `UPDATE site_data 
   SET ${type} = ${type} + 1 
@@ -18,14 +26,12 @@ const update = (siteName, type) => {
 
 
   client.query(query, (err, res) => {
-    if (err) throw err;
-    for (let row of res.rows) {
-      console.log(JSON.stringify(row));
-    }
+    if (err) throw err
   })
 }
 
 module.exports = {
   connect,
+  fetchStats,
   update,
 }
